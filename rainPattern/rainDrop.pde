@@ -1,14 +1,18 @@
 class rain {
   PVector pos = new PVector();
-  PVector v = new PVector();
+  PVector v = new PVector(); // Velocity
+  PVector acc = new PVector(); // Acceleration
 
   rain(int x, int y) {
     pos.set(x, y);
   }
 
-  void update(PVector v) {
-    this.v = v.mult(2);
+  void update(PVector acc) {
+    this.acc = acc.mult(0.2);
+    v.add(acc);
+    v.limit(2); // Limit the maximum speed to 2
     pos.add(v);
+    acc.mult(0); // Clear the acceleration
     edge();
   }
 
@@ -28,7 +32,7 @@ class rain {
 
   void show() {
     stroke(from);
-    strokeWeight(10);
+    strokeWeight(3);
     point(pos.x, pos.y);
   }
 }

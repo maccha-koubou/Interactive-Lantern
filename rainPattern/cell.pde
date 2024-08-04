@@ -1,6 +1,6 @@
 class cell {
   PVector pos = new PVector();
-  PVector v = new PVector(1, 0); // The cell's vector used to control the moving direction when the raindrops passes by
+  PVector v = new PVector(1, 0); // The cell's vector used to control the acceleration direction when the raindrops passes by
   float r; // Angle of the vector
 
   // Calculate the coordinates of the cell center

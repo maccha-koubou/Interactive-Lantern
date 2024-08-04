@@ -8,6 +8,16 @@ class ripple {
   }
 
   void update() {
-    radius ++;
+    radius += 3;
+  }
+}
+
+// Generate ripples randomly or when the user touches
+void generateRipple() {
+  if (random(0, 10) <= 0.1) {
+    ripples.add(new ripple(int(random(width)), int(random(height))));
+  }
+  if (mousePressed) {
+    ripples.add(new ripple(mouseX, mouseY));
   }
 }

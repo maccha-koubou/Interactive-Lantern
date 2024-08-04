@@ -34,14 +34,13 @@ void setup() {
   for (int i = 0; i < rainDrops.length; i++) {
     rainDrops[i] = new rain(int(random(width)), int(random(height)));
   }
-  
-  ripples.add(new ripple(400,400));
-  ripples.add(new ripple(800,800));
 }
 
 void draw() {
   noStroke();
-  background(bg);
+  fill(bg, 10);
+  rect(0, 0, width, height);
+  noFill();
   
   //drawFrame();
   //drawRipples(time);
@@ -55,13 +54,13 @@ void draw() {
       xoff += 0.05;
       cells[x][y].rippleRotate();
 
-      push();
+      /*push();
        stroke(255);
        strokeWeight(1);
        translate(x * cellSize, y * cellSize);
        rotate(cells[x][y].r);
        line(0, 0, cellSize, 0);
-       pop();
+       pop();*/
        
        //fill(cells[x][y].r * 256);
        //rect(x * cellSize, y * cellSize, cellSize, cellSize);
@@ -71,8 +70,15 @@ void draw() {
   }
 
   // Update ripples
-  for (int i = 0; i < ripples.size(); i++) {
+  for (int i = 0; i < ripples.size(); ) {
     ripples.get(i).update();
+    // Remove the ripple if its radius is larger than 300
+    if (ripples.get(i).radius >= 300)
+    {
+      ripples.remove(i);
+    } else {
+      i++;
+    }
   }
 
   // Update raindrops
@@ -80,6 +86,8 @@ void draw() {
     rainDrops[i].update(cells[int(rainDrops[i].pos.x / cellSize)][int(rainDrops[i].pos.y / cellSize)].v); // Convey the cell index the rain drop is in to the update()
     rainDrops[i].show();
   }
+
+  generateRipple();
 
   time = (time + 1) % 120;
   delay(15);
