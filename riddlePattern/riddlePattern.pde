@@ -25,13 +25,18 @@ String answer = "Answer";
 float textWidth;
 float textHeight;
 
+PShader glow;
+
 void setup() {
-  size(1080, 1080);
-  textBuffer = createGraphics(width, height);
+  size(1080, 1080, P2D);
+  textBuffer = createGraphics(width, height, P2D);
   background(bg);
 
   makeTextBuffer();
   pixelsOnText();
+
+  glow = loadShader("glow.glsl");
+  glow.set("resolution", float(width), float(height)); // Convey the window resolution to the shader
 
   // Initialize points of each wave layer
   for (int i = 0; i < mainLayer.length; i++) {
@@ -54,6 +59,7 @@ void setup() {
 void draw() {
   background(bg);
   drawFrame();
+  drawRipples(time);
   noStroke();
 
   // Update and draw the points of the three main wave layers
@@ -76,5 +82,9 @@ void draw() {
   }
 
   time = (time + 1) % 120;
-  delay(20);
+  delay(15);
+
+  // Convey the current window image to the shader and apply the shader on it
+  glow.set("texture", get());
+  filter(glow);
 }
