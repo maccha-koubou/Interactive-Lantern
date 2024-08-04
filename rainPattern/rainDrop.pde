@@ -8,25 +8,20 @@ class rain {
   }
 
   void update(PVector acc) {
-    this.acc = acc.mult(0.2);
+    this.acc = acc.mult(2);
     v.add(acc);
-    v.limit(2); // Limit the maximum speed to 2
+    v.limit(3); // Limit the maximum speed to 3
     pos.add(v);
     acc.mult(0); // Clear the acceleration
     edge();
   }
 
-  // If the raindrop touch the edge, teleports it to the other side
+  // If the raindrop touch the frame edge, teleports it to a random position on the frame
   void edge() {
-    if (pos.x < 0) {
-      pos.x = 1079;
-    } else if (pos.x >= 1079) {
-      pos.x = 0;
-    }
-    if (pos.y < 0) {
-      pos.y = 1079;
-    } else if (pos.y >= 1079) {
-      pos.y = 0;
+    if (dist(pos.x, pos.y, width / 2, height / 2) > 390) {
+      float t = random(TWO_PI);
+      pos.x = int(width / 2 + cos(t) * 390);
+      pos.y = int(height / 2 + sin(t) * 390);
     }
   }
 

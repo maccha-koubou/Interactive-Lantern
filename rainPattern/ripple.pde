@@ -9,6 +9,19 @@ class ripple {
 
   void update() {
     radius += 3;
+    visualize();
+  }
+
+  // Draw visualized ripple effect
+  void visualize() {
+    noFill();
+    strokeWeight(3);
+    stroke(from, 125 * map(radius, 0, 500, 1, -1));
+    circle(pos.x, pos.y, radius);
+    if (radius >= 50) {
+      stroke(from, 125 * map(radius, 50, 550, 1, -1));
+      circle(pos.x, pos.y, radius - 50);
+    }
   }
 }
 

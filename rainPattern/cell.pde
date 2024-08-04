@@ -14,7 +14,7 @@ class cell {
     for (ripple ripple : ripples) {
       float dist = dist(ripple.pos.x, ripple.pos.y, pos.x, pos.y); // Calculate the distance of each ripple to the cell and determine whether it is influenced by the ripple
       PVector angle = new PVector(ripple.pos.x - pos.x, ripple.pos.y - pos.y); // Calculate the vector direction around the ripple center
-      if (dist <= ripple.radius && dist >= ripple.radius - 100) { // Generate a ring
+      if (dist <= ripple.radius && dist >= ripple.radius - 200) { // Generate a ring
         r = angle.heading() + HALF_PI;
       }
     }
