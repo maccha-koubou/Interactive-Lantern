@@ -1,17 +1,17 @@
-class rain {
+class RainDrop {
   PVector pos = new PVector();
-  PVector v = new PVector(); // Velocity
-  PVector acc = new PVector(); // Acceleration
+  PVector vel = new PVector();
+  PVector acc = new PVector();
 
-  rain(int x, int y) {
+  RainDrop(int x, int y) {
     pos.set(x, y);
   }
 
   void update(PVector acc) {
     this.acc = acc.mult(2);
-    v.add(acc);
-    v.limit(3); // Limit the maximum speed to 3
-    pos.add(v);
+    vel.add(acc);
+    vel.limit(3); // Limit the maximum speed to 3
+    pos.add(vel);
     acc.mult(0); // Clear the acceleration
     edge();
   }
@@ -26,7 +26,7 @@ class rain {
   }
 
   void show() {
-    stroke(from);
+    stroke(PatternColor.main);
     strokeWeight(3);
     point(pos.x, pos.y);
   }

@@ -1,14 +1,8 @@
-color bg = #000000;
-color from = #FF934A;
-color to = #FFFFFF;
+RainParameter rainParameter;
+Cell[][] cells;
+RainDrop[] rainDrops = new RainDrop[500];
 
-int cellSize = 20;
-int col;
-int row;
-cell[][] cells;
-rain[] rainDrops = new rain[500];
-
-ArrayList<ripple> ripples = new ArrayList<ripple>();
+ArrayList<Ripple> ripples = new ArrayList<Ripple>();
 float zoff = 0;
 
 float time = 0;
@@ -28,39 +22,39 @@ void setup() {
   maskBuffer.circle(width / 2, height / 2, 780);
   maskBuffer.endDraw();
 
-  col = width / cellSize;
-  row = height / cellSize;
-  cells = new cell[col][row];
-  background(bg);
+  rainParameter = new RainParameter(20);
+
+  cells = new Cell[rainParameter.col][rainParameter.row];
+  background(PatternColor.bg);
 
   glow = loadShader("glow.glsl");
   glow.set("resolution", float(width), float(height)); // Convey the window resolution to the shader
 
   // Initialize the cells array
-  for (int x = 0; x < col; x++) {
-    for (int y = 0; y < col; y++) {
-      cells[x][y] = new cell(x, y);
+  for (int x = 0; x < rainParameter.col; x++) {
+    for (int y = 0; y < rainParameter.col; y++) {
+      cells[x][y] = new Cell(x, y);
     }
   }
   for (int i = 0; i < rainDrops.length; i++) {
-    float p = random(390);
-    float t = random(TWO_PI);
-    rainDrops[i] = new rain(int(width / 2 + cos(t) * p), int(height / 2 + sin(t) * p));
+    float a = random(390);
+    float r = random(TWO_PI);
+    rainDrops[i] = new RainDrop(int(width / 2 + cos(r) * a), int(height / 2 + sin(r) * a));
   }
 }
 
 void draw() {
   noStroke();
-  fill(bg, 10);
+  fill(PatternColor.bg, 10);
   rect(0, 0, width, height);
   noFill();
 
   // Generate a noise and convert it to angles of vectors
   float yoff = 0;
-  for (int y = 0; y < row; y++) {
+  for (int y = 0; y < rainParameter.row; y++) {
     float xoff = 0;
-    for (int x = 0; x < col; x++) {
-      cells[x][y].r = noise(xoff, yoff, zoff) * TWO_PI;
+    for (int x = 0; x < rainParameter.col; x++) {
+      cells[x][y].ang = noise(xoff, yoff, zoff) * TWO_PI;
       xoff += 0.05;
       cells[x][y].rippleRotate();
 
@@ -81,7 +75,7 @@ void draw() {
   for (int i = 0; i < ripples.size(); ) {
     ripples.get(i).update();
     // Remove the ripple if its radius is larger than 300
-    if (ripples.get(i).radius >= 300)
+    if (ripples.get(i).r >= 300)
     {
       ripples.remove(i);
     } else {
@@ -91,7 +85,9 @@ void draw() {
 
   // Update raindrops
   for (int i = 0; i < rainDrops.length; i++) {
-    rainDrops[i].update(cells[int(rainDrops[i].pos.x / cellSize)][int(rainDrops[i].pos.y / cellSize)].v); // Convey the cell index the rain drop is in to the update()
+    int x = int(rainDrops[i].pos.x / rainParameter.size);
+    int y = int(rainDrops[i].pos.y / rainParameter.size);
+    rainDrops[i].update(cells[x][y].vec); // Convey the cell index the rain drop is in to the update()
     rainDrops[i].show();
   }
 
@@ -104,7 +100,7 @@ void draw() {
 
   // Apply the mask to the buffer image and display it on the window
   patternBuffer.mask(maskBuffer);
-  background(bg);
+  background(PatternColor.bg);
   image(patternBuffer, 0, 0);
 
   // Then draw the frame and its ripple effect, ensuring they are not affected by the raindrop's tail effect

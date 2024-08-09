@@ -1,39 +1,25 @@
-color bg = #000000;
-color from = #FF934A;
-color to = #FFFFFF;
-
-int peak = int(random(3, 7)); // Number of peaks (vertexes) of the shape
-int pointsInGroup = int(map(peak, 3, 6, 30, 15)); // The number of points in a group (each peak is seen as a group) decreases as the peaks increase to keep the point density in a similar level
-int pointsInLayer = peak * pointsInGroup;
-int layerOfGradient = 9;
-int mainLayerNumber = 3;
-int pointsInTotal = pointsInLayer * (mainLayerNumber + layerOfGradient * 2);
+RiddleParameter riddleParameter = new RiddleParameter(3, 7, 3, 9, 120);
 int indexCount = 0; // Counter for numbering points
-float density = 1 / float(pointsInGroup);
-float radius = 120; // Radius of affect area of user touch
 float time = 0;
 
 float[] random = new float[] {random(-0.3, 0.7), random(-0.3, 0.7), random(-0.3, 0.7)}; // Set random initial rotation angle, speed, and fluctuation for each main wave layer
-p[][] mainLayer = new p[mainLayerNumber][pointsInLayer];
-p[][] layer12 = new p[layerOfGradient][pointsInLayer];
-p[][] layer23 = new p[layerOfGradient][pointsInLayer];
+Point[][] mainLayer = new Point[riddleParameter.mainLayer][riddleParameter.pointsInLayer];
+Point[][][] gradientLayer = new Point[riddleParameter.mainLayer - 1][riddleParameter.gradientLayer][riddleParameter.pointsInLayer];
 
+Answer answer;
 PGraphics textBuffer;
 color[] textBufferPixels;
-int[] textPixels = new int[pointsInTotal];
-String answer = "Answer";
-float textWidth;
-float textHeight;
+int[] textPixels = new int[riddleParameter.pointsInTotal];
 
 PShader glow;
 
 void setup() {
   size(1080, 1080, P2D);
-  textBuffer = createGraphics(width, height, P2D);
-  background(bg);
-
-  makeTextBuffer();
-  pixelsOnText();
+  background(PatternColor.bg);
+  
+  Answer answer = new Answer("Answer");
+  answer.makeTextBuffer();
+  answer.pixelsOnText();
 
   glow = loadShader("glow.glsl");
   glow.set("resolution", float(width), float(height)); // Convey the window resolution to the shader
@@ -41,43 +27,37 @@ void setup() {
   // Initialize points of each wave layer
   for (int i = 0; i < mainLayer.length; i++) {
     for (int j = 0; j < mainLayer[0].length; j++) {
-      mainLayer[i][j] = new p(j, i + 1);
+      mainLayer[i][j] = new Point(i, j);
     }
   }
-  for (int i = 0; i < layer12.length; i++) {
-    for (int j = 0; j < layer12[0].length; j++) {
-      layer12[i][j] = new p(i, j, 0);
-    }
-  }
-  for (int i = 0; i < layer23.length; i++) {
-    for (int j = 0; j < layer23[0].length; j++) {
-      layer23[i][j] = new p(i, j, 1);
+  for (int i = 0; i < gradientLayer.length; i++) {
+    for (int j = 0; j < gradientLayer[i].length; j++) {
+      for (int k = 0; k < gradientLayer[i][j].length; k++) {
+        gradientLayer[i][j][k] = new Point(i, j, k);
+      }
     }
   }
 }
 
 void draw() {
-  background(bg);
+  background(PatternColor.bg);
   drawFrame();
   drawRipples(time);
   noStroke();
 
   // Update and draw the points of the three main wave layers
-  for (p p : mainLayer[0]) {
-    p.updateMain();
-  }
-  for (p p : mainLayer[1]) {
-    p.updateMain();
-  }
-  for (p p : mainLayer[2]) {
-    p.updateMain();
+  for (Point[] pLayer: mainLayer){
+    for (Point p : pLayer) {
+      p.updateMain();
+    }
   }
 
   // Update and draw the points of the gradient wave layers
-  for (int i = 0; i < layer12[0].length; i++) {
-    for (int j = 0; j < layer12.length; j++) {
-      layer12[j][i].updateGradient();
-      layer23[j][i].updateGradient();
+  for (Point[][] pParentLayer: gradientLayer){
+    for (Point[] pLayer : pParentLayer) {
+      for (Point p : pLayer) {
+        p.updateGradient();
+      }
     }
   }
 
