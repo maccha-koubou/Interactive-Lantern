@@ -1,50 +1,62 @@
-class p {
-  float t; // Angular coordinate
-  float r, originalR; // Current radial coordinate and original radial coordinate
-  PVector pos = new PVector(); // Current rectangular coordinates
-  PVector originalPos = new PVector(); // Original rectangular coordinates
+class Point {
+  float ang;
+  float rad, originalRad;
+  PVector pos = new PVector();
+  PVector originalPos = new PVector();
   PVector answerPos = new PVector(); // Assigned coordinates on answer text for each point
   float size;
-  float progressGo = 0, progressBack = 0; // Progress of the point in the moving process
-  int indexInTotal, indexInGroup; // Index of the point in all the points and in the current group
-  int layer; // Layer of the point in the main wave layers
-  int parent, subLayer; // Parent layer and sub layer of the point in gradient wave layers
+  float progressGo = 0, progressBack = 0;
+  int indexInTotal, indexInGroup;
+  int layer; 
+  int parent, subLayer;
   boolean attracted = false;
 
   // Constructor of the main wave layer point
-  p(int i, int l) {
-    layer = l;
+  Point(int layer, int i) {
+    this.layer = layer;
+    indexInGroup = i % riddleParameter.pointsInGroup;
     indexInTotal = indexCount; // Assign a index to each point
     indexCount++;
-    indexInGroup = i % pointsInGroup;
-    t = TWO_PI / (pointsInLayer) * i + random[layer - 1]; // Random initial angle
-    originalR = map(sin(TWO_PI * density * i), -1, 1, 350 * (1 / float(layer)), 450 * (1 / float(layer)));
-    size = map(sin(TWO_PI * density * i), -1, 1, 15 * (1 / float(layer)), 10 * (1 / float(layer)));
-    answerPos.x = textPixels[indexInTotal] % width; // Assign coordinates on answer text for each point
+    
+    float fluctuation = sin(TWO_PI * riddleParameter.density * i);
+    float scale = (1 / float(layer + 1));
+    ang = TWO_PI / (riddleParameter.pointsInLayer) * i + random[layer]; // Random initial angle
+    originalRad = map(fluctuation, -1, 1, 350 * scale, 450 * scale);
+    size = map(fluctuation, -1, 1, 15 * scale, 10 * scale);
+    
+    // Assign coordinates on answer text for each point
+    answerPos.x = textPixels[indexInTotal] % width;
     answerPos.y = textPixels[indexInTotal] / width;
+    
     updateMain();
   }
 
   // Constructor of the gradient wave layer point
-  p(int i, int j, int p) {
-    parent = p;
-    subLayer = i;
+  Point(int parent, int subLayer, int i) {
+    this.parent = parent;
+    this.subLayer = subLayer;
+    indexInGroup = i;
     indexInTotal = indexCount; // Assign a index to each point
     indexCount++;
-    indexInGroup = j;
-    size = map(i + 1, 0, 10, mainLayer[p][j].size, mainLayer[p+1][j].size);
-    answerPos.x = textPixels[indexInTotal] % width; // Assign coordinates on answer text for each point
+    
+    size = map(subLayer + 1, 0, 10, mainLayer[parent][i].size, mainLayer[parent + 1][i].size);
+    
+    // Assign coordinates on answer text for each point
+    answerPos.x = textPixels[indexInTotal] % width;
     answerPos.y = textPixels[indexInTotal] / width;
+    
     updateGradient();
   }
 
   // Update the main wave layer point
   void updateMain() {
-    r = originalR * map(cos(time/120 * TWO_PI), -1, 1, 0.7, map(-sin(TWO_PI * density * indexInGroup), -1, 1, random[layer - 1], 1));
-    t = t+0.01*(random[layer - 1] + 0.5);
+    float t = cos(time / 120 * TWO_PI);
+    float fluctuation = sin(TWO_PI * riddleParameter.density * indexInGroup);
+    rad = originalRad * map(t, -1, 1, 0.7, map(-fluctuation, -1, 1, random[layer], 1));
+    ang = ang + 0.01 * (random[layer] + 0.5);
     // Convert polar coordinates to rectangular coordinates
-    originalPos.x = r * cos(t) + width / 2;
-    originalPos.y = r * sin(t) + height / 2;
+    originalPos.x = rad * cos(ang) + width / 2;
+    originalPos.y = rad * sin(ang) + height / 2;
     if (attracted == false) {
       pos.x = originalPos.x;
       pos.y = originalPos.y;
@@ -55,8 +67,8 @@ class p {
 
   // Update the gradient wave layer point
   void updateGradient() {
-    float aveX = map(subLayer + 1, 0, 10, mainLayer[parent][indexInGroup].originalPos.x, mainLayer[parent+1][indexInGroup].originalPos.x);
-    float aveY = map(subLayer + 1, 0, 10, mainLayer[parent][indexInGroup].originalPos.y, mainLayer[parent+1][indexInGroup].originalPos.y);
+    float aveX = map(subLayer + 1, 0, 10, mainLayer[parent][indexInGroup].originalPos.x, mainLayer[parent + 1][indexInGroup].originalPos.x);
+    float aveY = map(subLayer + 1, 0, 10, mainLayer[parent][indexInGroup].originalPos.y, mainLayer[parent + 1][indexInGroup].originalPos.y);
     originalPos.x = aveX;
     originalPos.y = aveY;
     if (attracted == false) {
@@ -69,7 +81,10 @@ class p {
 
   // Draw points
   void show() {
-    stroke(lerpColor(from, to, map(sin(TWO_PI * density * indexInGroup), -1, 1, -0.5, 1))); // Calculate gradient color
+    color pointColor = 0;
+    float location = sin(TWO_PI * riddleParameter.density * indexInGroup);
+    pointColor = lerpColor(PatternColor.main, PatternColor.sub, map(location, -1, 1, -0.5, 1));
+    stroke(pointColor);
     strokeWeight(size);
     point(pos.x, pos.y);
   }
@@ -77,7 +92,7 @@ class p {
   // Points move to the touched answer text when the user touches
   void move() {
     float d = dist(mouseX, mouseY, answerPos.x, answerPos.y);
-    if (mousePressed == true && d <= radius) { // If the assigned answer text coordinates of the point is in the affected area of user's touch point
+    if (mousePressed == true && d <= riddleParameter.radius) { // If the assigned answer text coordinates of the point is in the affected area of user's touch point
       attracted = true;
       progressBack = 0;
       progressGo += 0.1;
