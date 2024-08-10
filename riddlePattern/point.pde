@@ -83,7 +83,20 @@ class Point {
   void show() {
     color pointColor = 0;
     float location = sin(TWO_PI * riddleParameter.density * indexInGroup);
-    pointColor = lerpColor(PatternColor.main, PatternColor.sub, map(location, -1, 1, -0.5, 1));
+    switch (PatternColor.lv) { // Calculate gradient color based on the pattern level
+      case 0 :
+        pointColor = lerpColor(PatternColor.main, PatternColor.lv0, map(location, -1, 1, -0.5, 1));
+        break;
+      case 1 :
+        if (location < 0) pointColor = lerpColor(PatternColor.main, PatternColor.lv1, map(location, -1, 0, -0.5, 1));
+        else pointColor = lerpColor(PatternColor.lv1, PatternColor.lv0, location);
+        break;
+      case 2 :
+        if (location < -0.3) pointColor = lerpColor(PatternColor.main, PatternColor.lv1, map(location, -1, -0.3, -0.5, 1));
+        else if (location < 0.35) pointColor = lerpColor(PatternColor.lv1, PatternColor.lv2, map(location, 0, 0.35, 0, 1));
+        else pointColor = lerpColor(PatternColor.lv2, PatternColor.lv0, map(location, 0.35, 1, 0, 1));
+        break;
+    }
     stroke(pointColor);
     strokeWeight(size);
     point(pos.x, pos.y);

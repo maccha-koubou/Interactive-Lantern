@@ -1,7 +1,11 @@
 class PatternColor {
   static final color bg = #000000;
   static final color main = #FF934A;
-  static final color sub = #FFFFFF;
+  static final int lv = 2;
+  static final color lv0 = #FFFFFF;
+  static final color lv1 = #73AF93;
+  static final color lv2 = #30A8FD;
+  //static final int[] sec = {#FFFFFF, #73AF93, #30A8FD};
 
   private PatternColor() {}
 }

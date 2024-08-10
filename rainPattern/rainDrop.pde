@@ -2,6 +2,7 @@ class RainDrop {
   PVector pos = new PVector();
   PVector vel = new PVector();
   PVector acc = new PVector();
+  color rainDropColor = PatternColor.main;
 
   RainDrop(int x, int y) {
     pos.set(x, y);
@@ -14,6 +15,7 @@ class RainDrop {
     pos.add(vel);
     acc.mult(0); // Clear the acceleration
     edge();
+    updateColor();
   }
 
   // If the raindrop touch the frame edge, teleports it to a random position on the frame
@@ -26,8 +28,26 @@ class RainDrop {
   }
 
   void show() {
-    stroke(PatternColor.main);
+    stroke(rainDropColor);
     strokeWeight(3);
     point(pos.x, pos.y);
+  }
+  
+  void updateColor() {
+    float colorNoise = noise(pos.x * 0.01, pos.y * 0.01, zoff);
+    switch (PatternColor.lv) { // Calculate gradient color based on the pattern level
+    case 0 :
+      rainDropColor = lerpColor(PatternColor.main, PatternColor.lv0, map(colorNoise, 0, 1, -2, 2));
+      break;
+    case 1 :
+      if (colorNoise < 0.5) rainDropColor = lerpColor(PatternColor.main, PatternColor.lv0, map(colorNoise, 0, 0.5, -2, 1));
+      else rainDropColor = lerpColor(PatternColor.lv0, PatternColor.lv1, map(colorNoise, 0.5, 1, 0, 5));
+      break;
+    case 2 :
+      if (colorNoise < 0.5) rainDropColor = lerpColor(PatternColor.main, PatternColor.lv0, map(colorNoise, 0, 0.5, -2, 1));
+      else if (colorNoise < 0.6) rainDropColor = lerpColor(PatternColor.lv0, PatternColor.lv1, map(colorNoise, 0.5, 0.6, 0, 1));
+      else rainDropColor = lerpColor(PatternColor.lv1, PatternColor.lv2, map(colorNoise, 0.6, 1, 0, 3));
+      break;
+    }
   }
 }
