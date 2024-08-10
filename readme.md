@@ -6,9 +6,9 @@ A simple Processing program as a part of a spatial and interactive design projec
 
 In this project, I designed a gamified exhibition hall combining physical space with digital media to show Qinhuai culture. Users can not only interact directly with the interactive installation and media in the space, but interact with the exhibition through the virtual lantern patterns in a companion app.
 
-![introduction_1](img\introduction_1.png)
+![introduction_1](img/introduction_1.png)
 
-![introduction_2](img\introduction_2.png)
+![introduction_2](img/introduction_2.png)
 
 
 
