@@ -16,10 +16,12 @@ class Ripple {
   void visualize() {
     noFill();
     strokeWeight(3);
-    stroke(PatternColor.main, 125 * map(r, 0, 500, 1, -1));
+    if (PatternColor.lv >= 1) stroke(PatternColor.lv1, 80 * map(r, 0, 500, 1, -1));
+    else stroke(PatternColor.lv0, 125 * map(r, 0, 500, 1, -1));
     circle(pos.x, pos.y, r);
     if (r >= 50) {
-      stroke(PatternColor.main, 125 * map(r, 50, 550, 1, -1));
+      if (PatternColor.lv >= 2) stroke(PatternColor.lv2, 80 * map(r, 50, 550, 1, -1));
+      else stroke(PatternColor.lv0, 125 * map(r, 0, 500, 1, -1));
       circle(pos.x, pos.y, r - 50);
     }
   }
